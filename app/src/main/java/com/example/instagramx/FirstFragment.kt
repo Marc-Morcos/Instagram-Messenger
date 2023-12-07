@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +30,13 @@ var globalContext: Context? = null
  */
 class FirstFragment : Fragment() {
 
+
+
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
+
+    //https://stackoverflow.com/questions/45603682/file-upload-in-webview-android-studio
     private var _binding: FragmentFirstBinding? = null
     private lateinit var web_view_controller:WebViewController
     var mWebView: WebView? = null
@@ -36,12 +44,6 @@ class FirstFragment : Fragment() {
     var uploadMessage: ValueCallback<Array<Uri>>? = null
     val REQUEST_SELECT_FILE = 100
     private val FILECHOOSER_RESULTCODE = 1
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
-
-    //https://stackoverflow.com/questions/45603682/file-upload-in-webview-android-studio
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (requestCode == REQUEST_SELECT_FILE) {
@@ -52,16 +54,9 @@ class FirstFragment : Fragment() {
                         intent
                     )
                 )
+                Log.d("Image",intent.toString())
                 uploadMessage = null
             }
-        } else if (requestCode == FILECHOOSER_RESULTCODE) {
-            if (null == mUploadMessage) return
-            // Use MainActivity.RESULT_OK if you're implementing WebView inside Fragment
-            // Use RESULT_OK only if you're implementing WebView inside an Activity
-            val result =
-                if (intent == null || resultCode != RESULT_OK) null else intent.data
-            mUploadMessage!!.onReceiveValue(result)
-            mUploadMessage = null
         } else Toast.makeText(
             requireActivity().applicationContext,
             "Failed to Upload Image",
@@ -95,7 +90,7 @@ class FirstFragment : Fragment() {
 
         //https://stackoverflow.com/questions/45603682/file-upload-in-webview-android-studio
         mWebView!!.webChromeClient = object : WebChromeClient() {
-            
+
             // For Lollipop 5.0+ Devices
             override fun onShowFileChooser(
                 mWebView: WebView,
