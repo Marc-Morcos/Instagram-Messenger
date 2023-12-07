@@ -77,7 +77,7 @@ class WebViewController : WebViewClient() {
 
             val tabIntentBuilder = CustomTabsIntent.Builder()
             val tabsIntent = tabIntentBuilder.build()
-            tabsIntent.launchUrl(globalContext!!, Uri.parse(urlNew))
+            tabsIntent.launchUrl(globalContext!!, Uri.parse(url))
             return true
         }
 

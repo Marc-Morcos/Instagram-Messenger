@@ -17,13 +17,6 @@
         android:theme="@style/Theme.InstagramX"
         tools:targetApi="31">
 
-        <service android:name=".NotificationListener"
-            android:label="InstagramXNotificationService"
-            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
-        <intent-filter>
-            <action android:name="android.service.notification.NotificationListenerService" />
-        </intent-filter>
-
         <activity
             android:name=".MainActivity"
             android:exported="true"
