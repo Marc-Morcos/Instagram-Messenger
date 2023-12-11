@@ -90,6 +90,7 @@ public class NLService extends NotificationListenerService {
     }
     */
 
+    //need to manually enable a protected setting for this to work
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
             if(sbn.getNotification().tickerText == null || sbn.getPackageName() == null){
