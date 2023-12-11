@@ -24,7 +24,7 @@ public class NLService extends NotificationListenerService {
     int NotificationID = 0;
 
     public void createNotification(String NTitle, String NText) {
-        Log.i(TAG, "Creating Notification");
+//        Log.i(TAG, "Creating Notification");
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -104,8 +104,8 @@ public class NLService extends NotificationListenerService {
 
             } else if (packageName.equals("com.android.chrome") && tickerTextStr.startsWith("Instagram")) {
                 //replace chrome instagram notification with instagram x notification
-                Log.i(TAG, "**********  onNotificationPosted");
-                Log.i(TAG, "ID :" + sbn.getId() + "t" + sbn.getNotification().tickerText + "\t" + sbn.getPackageName());
+//                Log.i(TAG, "**********  onNotificationPosted");
+//                Log.i(TAG, "ID :" + sbn.getId() + "t" + sbn.getNotification().tickerText + "\t" + sbn.getPackageName());
 
                 //create new notification, removing first line
                 createNotification("InstagramX", tickerTextStr.substring(tickerTextStr.indexOf('\n')+1));
@@ -114,8 +114,8 @@ public class NLService extends NotificationListenerService {
                 cancelNotification(sbn.getKey());
             } else if (packageName.equals("com.instagram.android")){
                 //replace instagram notification with instagram x notification
-                Log.i(TAG, "**********  onNotificationPosted");
-                Log.i(TAG, "ID :" + sbn.getId() + "t" + sbn.getNotification().tickerText + "\t" + sbn.getPackageName());
+//                Log.i(TAG, "**********  onNotificationPosted");
+//                Log.i(TAG, "ID :" + sbn.getId() + "t" + sbn.getNotification().tickerText + "\t" + sbn.getPackageName());
 
                 //create new notification, removing first line
                 String Text = sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT).toString();
@@ -125,10 +125,11 @@ public class NLService extends NotificationListenerService {
                 //remove original notification
                 cancelNotification(sbn.getKey());
 
-            } else{
-                Log.i(TAG, "**********  onNotificationPosted ignored");
-                Log.i(TAG, packageName);
             }
+//            else{
+//                Log.i(TAG, "**********  onNotificationPosted ignored");
+//                Log.i(TAG, packageName);
+//            }
     }
 
 //    @Override
