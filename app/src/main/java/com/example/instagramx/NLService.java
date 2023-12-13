@@ -96,6 +96,7 @@ public class NLService extends NotificationListenerService {
             if(sbn.getNotification().tickerText == null || sbn.getPackageName() == null){
                 return;
             }
+//        Log.i(TAG, "**********  onNotificationPosted");
 
             String tickerTextStr = sbn.getNotification().tickerText.toString();
             String packageName = sbn.getPackageName().toString();
@@ -105,7 +106,6 @@ public class NLService extends NotificationListenerService {
 
             } else if (packageName.equals("com.android.chrome") && tickerTextStr.startsWith("Instagram")) {
                 //replace chrome instagram notification with instagram x notification
-//                Log.i(TAG, "**********  onNotificationPosted");
 //                Log.i(TAG, "ID :" + sbn.getId() + "t" + sbn.getNotification().tickerText + "\t" + sbn.getPackageName());
 
                 //create new notification, removing first line
@@ -115,12 +115,20 @@ public class NLService extends NotificationListenerService {
                 cancelNotification(sbn.getKey());
             } else if (packageName.equals("com.instagram.android")){
                 //replace instagram notification with instagram x notification
-//                Log.i(TAG, "**********  onNotificationPosted");
 //                Log.i(TAG, "ID :" + sbn.getId() + "t" + sbn.getNotification().tickerText + "\t" + sbn.getPackageName());
 
                 //create new notification, removing first line
-                String Text = sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT).toString();
-                String Title = sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE).toString();
+                String Title = "Instagram";
+                String Text = "Could not load message";
+                if(sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT) != null) {
+                    Text = sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT).toString();
+                }
+                if(sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE) != null){
+                    Title = sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE).toString();
+                }
+
+
+//                Log.i(TAG, "title :" + Title + "t: " + Text);
                 createNotification(Title, Text);
 
                 //remove original notification
@@ -128,7 +136,7 @@ public class NLService extends NotificationListenerService {
 
             }
 //            else{
-//                Log.i(TAG, "**********  onNotificationPosted ignored");
+//                Log.i(TAG, "********** ignored");
 //                Log.i(TAG, packageName);
 //            }
     }
