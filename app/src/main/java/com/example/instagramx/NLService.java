@@ -11,6 +11,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -42,9 +43,56 @@ public class NLService extends NotificationListenerService {
         mBuilder.setContentIntent(pIntent);
 
 
+        postNotification(mBuilder.build());
+    }
+
+    public void postNotification(Notification notification) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NotificationID, mBuilder.build());
+        notificationManager.notify(NotificationID, notification);
         NotificationID++;
+    }
+
+    public void repostNotification(StatusBarNotification sbn) {
+        //replace instagram notification with instagram x notification
+
+        Notification notificationOld = sbn.getNotification();
+
+        NotificationCompat.Builder mBuilder =
+                null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            mBuilder = new NotificationCompat.Builder(this)
+                    .setAutoCancel(true)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setSmallIcon(R.mipmap.logo)
+                    .setGroup(notificationOld.getGroup())
+                    .setGroupAlertBehavior(notificationOld.getGroupAlertBehavior())
+                    .setShortcutId(notificationOld.getShortcutId())
+                    .setSortKey(notificationOld.getSortKey())
+                    .setBubbleMetadata(NotificationCompat.BubbleMetadata.fromPlatform(notificationOld.getBubbleMetadata()))
+                    .setBadgeIconType(notificationOld.getBadgeIconType())
+                    .setSettingsText(notificationOld.getSettingsText())
+                    .setTimeoutAfter(notificationOld.getTimeoutAfter())
+                    .setChannelId("InstagramXNotificationChannel");
+        }
+
+        if(sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT) != null) {
+            mBuilder.setContentText(sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT).toString());
+        }
+        if(sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE) != null){
+            mBuilder.setContentTitle(sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE).toString());
+        }
+
+        //open app when clicked
+        Intent intent = getPackageManager().getLaunchIntentForPackage("com.example.instagramx");
+        PendingIntent pIntent = PendingIntent.getActivity(this, 0,intent, FLAG_IMMUTABLE);
+        mBuilder.setContentIntent(pIntent);
+
+        //post new notification
+        postNotification(mBuilder.build());
+
+        //remove original notification
+        cancelNotification(sbn.getKey());
+
     }
 
     @Override
@@ -75,77 +123,33 @@ public class NLService extends NotificationListenerService {
         Log.i(TAG, "NLService destroyed!");
     }
 
-    /* > API 21
-    @Override
-    public void onListenerDisconnected() {
-        super.onListenerDisconnected();
-        Log.w(TAG, "Notification listener DISCONNECTED from the notification service! Scheduling a reconnect...");
-        // requestRebind(new ComponentName(this.getPackageName(), this.getClass().getCanonicalName()));
-    }
-
-    @Override
-    public void onListenerConnected() {
-        super.onListenerConnected();
-        Log.w(TAG, "Notification listener connected with the notification service!");
-    }
-    */
 
     //need to manually enable a protected setting for this to work
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
             if(sbn.getNotification().tickerText == null || sbn.getPackageName() == null){
+//                Log.i(TAG, "********** ignored due to null");
                 return;
             }
-//        Log.i(TAG, "**********  onNotificationPosted");
+//            Log.i(TAG, "**********  onNotificationPosted");
+//            Log.i(TAG, sbn.getPackageName()+ "\t" + sbn.toString() + "\t" + sbn.getNotification().toString());
 
             String tickerTextStr = sbn.getNotification().tickerText.toString();
             String packageName = sbn.getPackageName().toString();
             if (tickerTextStr.equals("Instagram\nYou have unseen notifications.")) {
+//                Log.i(TAG, "********** delete");
                 //remove annoying notification
                 cancelNotification(sbn.getKey());
 
-            } else if (packageName.equals("com.android.chrome") && tickerTextStr.startsWith("Instagram")) {
-                //replace chrome instagram notification with instagram x notification
-//                Log.i(TAG, "ID :" + sbn.getId() + "t" + sbn.getNotification().tickerText + "\t" + sbn.getPackageName());
-
-                //create new notification, removing first line
-                createNotification("InstagramX", tickerTextStr.substring(tickerTextStr.indexOf('\n')+1));
-
-                //remove original notification
-                cancelNotification(sbn.getKey());
-            } else if (packageName.equals("com.instagram.android")){
-                //replace instagram notification with instagram x notification
-//                Log.i(TAG, "ID :" + sbn.getId() + "t" + sbn.getNotification().tickerText + "\t" + sbn.getPackageName());
-
-                //create new notification, removing first line
-                String Title = "Instagram";
-                String Text = "Could not load message";
-                if(sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT) != null) {
-                    Text = sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT).toString();
-                }
-                if(sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE) != null){
-                    Title = sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE).toString();
-                }
-
-
-//                Log.i(TAG, "title :" + Title + "t: " + Text);
-                createNotification(Title, Text);
-
-                //remove original notification
-                cancelNotification(sbn.getKey());
-
+            } else if ((packageName.equals("com.android.chrome") && tickerTextStr.startsWith("Instagram"))
+                    || (packageName.equals("com.instagram.android"))){
+//                Log.i(TAG, "********** repost");
+                repostNotification(sbn);
             }
-//            else{
+            else{
 //                Log.i(TAG, "********** ignored");
-//                Log.i(TAG, packageName);
-//            }
+            }
     }
-
-//    @Override
-//    public void onNotificationRemoved(StatusBarNotification sbn) {
-//        Log.i(TAG,"********** onNotificationRemoved");
-//        Log.i(TAG,"ID :" + sbn.getId() + "t" + sbn.getNotification().tickerText +"\t" + sbn.getPackageName());
-//    }
 
 
 }
