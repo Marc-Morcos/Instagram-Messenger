@@ -11,6 +11,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
@@ -84,6 +88,17 @@ public class NLService extends NotificationListenerService {
         if(sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE) != null){
             mBuilder.setContentTitle(sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE).toString());
         }
+        if(sbn.getNotification().extras.get(Notification.EXTRA_LARGE_ICON) != null){
+            android.graphics.drawable.Icon temp = (Icon) sbn.getNotification().extras.get(Notification.EXTRA_LARGE_ICON);
+            Drawable drawable = temp.loadDrawable(this);
+            if (drawable instanceof BitmapDrawable) {
+                BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+                if(bitmapDrawable.getBitmap() != null) {
+                    mBuilder.setLargeIcon(bitmapDrawable.getBitmap());
+                }
+            }
+        }
+
 
         //open app when clicked
         Intent intent = getPackageManager().getLaunchIntentForPackage("com.example.instagramx");
