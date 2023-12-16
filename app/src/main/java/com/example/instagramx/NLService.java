@@ -12,6 +12,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -25,7 +26,6 @@ public class NLService extends NotificationListenerService {
     int NotificationID = 0;
 
     public void createNotification(String NTitle, String NText) {
-//        Log.i(TAG, "Creating Notification");
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -51,29 +51,32 @@ public class NLService extends NotificationListenerService {
         notificationManager.notify(NotificationID, notification);
         NotificationID++;
     }
+    public void postNotification(Notification notification,int overrideNotificationID) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(overrideNotificationID, notification);
+    }
 
     public void repostNotification(StatusBarNotification sbn) {
         //replace instagram notification with instagram x notification
 
         Notification notificationOld = sbn.getNotification();
 
-        NotificationCompat.Builder mBuilder =
-                null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            mBuilder = new NotificationCompat.Builder(this)
-                    .setAutoCancel(true)
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setSmallIcon(R.mipmap.logo)
-                    .setGroup(notificationOld.getGroup())
-                    .setGroupAlertBehavior(notificationOld.getGroupAlertBehavior())
-                    .setShortcutId(notificationOld.getShortcutId())
-                    .setSortKey(notificationOld.getSortKey())
-                    .setBubbleMetadata(NotificationCompat.BubbleMetadata.fromPlatform(notificationOld.getBubbleMetadata()))
-                    .setBadgeIconType(notificationOld.getBadgeIconType())
-                    .setSettingsText(notificationOld.getSettingsText())
-                    .setTimeoutAfter(notificationOld.getTimeoutAfter())
-                    .setChannelId("InstagramXNotificationChannel");
-        }
+                NotificationCompat.Builder mBuilder = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    mBuilder = new NotificationCompat.Builder(this)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            .setSmallIcon(R.mipmap.logo)
+//                            .setGroup(notificationOld.getGroup())
+//                            .setGroupAlertBehavior(notificationOld.getGroupAlertBehavior())
+                            .setShortcutId(notificationOld.getShortcutId())
+                            .setSortKey(notificationOld.getSortKey())
+                            .setBubbleMetadata(NotificationCompat.BubbleMetadata.fromPlatform(notificationOld.getBubbleMetadata()))
+                            .setBadgeIconType(notificationOld.getBadgeIconType())
+                            .setSettingsText(notificationOld.getSettingsText())
+                            .setTimeoutAfter(notificationOld.getTimeoutAfter())
+                            .setAutoCancel(true)
+                            .setChannelId("InstagramXNotificationChannel");
+                }
 
         if(sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT) != null) {
             mBuilder.setContentText(sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT).toString());
@@ -87,11 +90,28 @@ public class NLService extends NotificationListenerService {
         PendingIntent pIntent = PendingIntent.getActivity(this, 0,intent, FLAG_IMMUTABLE);
         mBuilder.setContentIntent(pIntent);
 
+        //group messages
+        String groupID = null;
+        if (sbn.getNotification().extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE) != null) {
+            groupID = "com.example.instagramx."+sbn.getNotification().extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE).toString();
+        } else if (sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE) != null) {
+            groupID = "com.example.instagramx."+sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE).toString();
+        }
+        mBuilder.setGroup(groupID);
+
         //post new notification
         postNotification(mBuilder.build());
 
         //remove original notification
         cancelNotification(sbn.getKey());
+
+        //group messages
+        if(groupID!=null){
+            mBuilder.setAutoCancel(true)
+                    .setContentTitle(groupID)
+                    .setGroupSummary(true);
+            postNotification(mBuilder.build(),groupID.hashCode());
+        }
 
     }
 
@@ -114,13 +134,21 @@ public class NLService extends NotificationListenerService {
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
         }
-        Log.i(TAG, "NLService created!");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "NLService destroyed!");
+    }
+
+    public void printExtras(Bundle bundle){
+        if (bundle != null) {
+            Log.i("TAG", "********* Extras");
+            for (String key : bundle.keySet()) {
+                Log.i(TAG, key + " : " + (bundle.get(key) != null ? bundle.get(key) : "NULL"));
+            }
+        }
     }
 
 
@@ -132,7 +160,8 @@ public class NLService extends NotificationListenerService {
                 return;
             }
 //            Log.i(TAG, "**********  onNotificationPosted");
-//            Log.i(TAG, sbn.getPackageName()+ "\t" + sbn.toString() + "\t" + sbn.getNotification().toString());
+//            Log.i(TAG, "PACKAGE:"+sbn.getPackageName()+ "\tDASH NOTIFICATION:" + sbn.toString() + "\tNOTIFICATION" + sbn.getNotification().toString());
+//            printExtras(sbn.getNotification().extras); //Log.i
 
             String tickerTextStr = sbn.getNotification().tickerText.toString();
             String packageName = sbn.getPackageName().toString();
@@ -146,9 +175,9 @@ public class NLService extends NotificationListenerService {
 //                Log.i(TAG, "********** repost");
                 repostNotification(sbn);
             }
-            else{
+//            else{
 //                Log.i(TAG, "********** ignored");
-            }
+//            }
     }
 
 
