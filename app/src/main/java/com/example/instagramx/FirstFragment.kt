@@ -1,6 +1,5 @@
 package com.example.instagramx
 
-import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -10,6 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -87,9 +87,20 @@ class FirstFragment : Fragment() {
         settings.setJavaScriptEnabled(true);
         val mWebSettings = mWebView!!.settings
         mWebSettings.javaScriptEnabled = true
-        mWebSettings.setSupportZoom(false)
+        mWebSettings.setSupportZoom(true)
+        mWebSettings.builtInZoomControls = true
         mWebSettings.allowFileAccess = true
         mWebSettings.allowContentAccess = true
+
+//      Load image on long press
+        webView.setOnLongClickListener(View.OnLongClickListener { v ->
+            val hr = (v as WebView).hitTestResult
+            if(hr.type == WebView.HitTestResult.IMAGE_TYPE && hr.extra!=null){
+                webView.loadUrl(hr.extra!!)
+            }
+            Log.i("LongClick", "Type=" + hr.type)
+            false
+        })
 
         //https://stackoverflow.com/questions/45603682/file-upload-in-webview-android-studio
         mWebView!!.webChromeClient = object : WebChromeClient() {
