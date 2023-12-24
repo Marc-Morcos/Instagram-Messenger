@@ -48,6 +48,9 @@ class FirstFragment : Fragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (requestCode == REQUEST_SELECT_FILE) {
                 if (uploadMessage == null) return
+                if (intent != null && intent.clipData!=null && intent.clipData?.getItemAt(0)!=null) {
+                    intent.setData(intent.clipData?.getItemAt(0)?.getUri())
+                }
                 uploadMessage!!.onReceiveValue(
                     WebChromeClient.FileChooserParams.parseResult(
                         resultCode,
