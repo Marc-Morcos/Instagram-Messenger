@@ -33,7 +33,7 @@ public class NLService extends NotificationListenerService {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.logo)
+                        .setSmallIcon(R.drawable.notification_icon)
                         .setContentTitle(NTitle)
                         .setContentText(NText)
                         .setDefaults(NotificationCompat.DEFAULT_ALL)
