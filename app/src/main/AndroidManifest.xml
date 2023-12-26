@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.InstagramX"
+        android:theme="@style/Theme.instagram_messenger"
         tools:targetApi="31">
 
         <activity
@@ -24,7 +24,7 @@
             android:exported="true"
             android:screenOrientation="portrait"
             android:label="@string/app_name"
-            android:theme="@style/Theme.InstagramX">
+            android:theme="@style/Theme.instagram_messenger">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,7 +33,7 @@
         </activity>
 
         <service android:name=".NLService"
-            android:label="InstagramXNotificationListener"
+            android:label="instagram_messengerNotificationListener"
             android:exported="false"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>

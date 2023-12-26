@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.instagramx"
+    namespace = "com.example.instagram_messenger"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.instagramx"
+        applicationId = "com.example.instagram_messenger"
         minSdk = 24
         targetSdk = 33
         versionCode = 1

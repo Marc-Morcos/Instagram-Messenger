@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Instagram X"
+rootProject.name = "Instagram Messenger"
 include(":app")
