@@ -1,7 +1,7 @@
 //based on https://stackoverflow.com/questions/41425986/call-a-notification-listener-inside-a-background-service-in-android-studio
 
-//convert chrome instagram notifications to instagram x notifications
-package com.example.instagramx;
+//convert chrome instagram notifications to instagram Messenger notifications
+package com.example.instagram_messenger;
 
 import static android.app.PendingIntent.FLAG_IMMUTABLE;
 
@@ -26,7 +26,7 @@ import androidx.core.app.NotificationCompat;
 
 public class NLService extends NotificationListenerService {
 
-    private String TAG = "InstagramXNotificationListener";
+    private String TAG = "instagram_messengerNotificationListener";
     int NotificationID = 0;
 
     public void createNotification(String NTitle, String NText) {
@@ -39,10 +39,10 @@ public class NLService extends NotificationListenerService {
                         .setDefaults(NotificationCompat.DEFAULT_ALL)
                         .setAutoCancel(true)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .setChannelId("InstagramXNotificationChannel");
+                        .setChannelId("instagram_messengerNotificationChannel");
 
         //open app when clicked
-        Intent intent = getPackageManager().getLaunchIntentForPackage("com.example.instagramx");
+        Intent intent = getPackageManager().getLaunchIntentForPackage("com.example.instagram_messenger");
         PendingIntent pIntent = PendingIntent.getActivity(this, 0,intent, FLAG_IMMUTABLE);
         mBuilder.setContentIntent(pIntent);
 
@@ -61,7 +61,7 @@ public class NLService extends NotificationListenerService {
     }
 
     public void repostNotification(StatusBarNotification sbn) {
-        //replace instagram notification with instagram x notification
+        //replace instagram notification with instagram Messenger notification
 
         Notification notificationOld = sbn.getNotification();
 
@@ -69,7 +69,7 @@ public class NLService extends NotificationListenerService {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
                     mBuilder = new NotificationCompat.Builder(this)
                             .setPriority(NotificationCompat.PRIORITY_HIGH)
-                            .setSmallIcon(R.mipmap.logo)
+                            .setSmallIcon(R.drawable.notification_icon)
 //                            .setGroup(notificationOld.getGroup())
 //                            .setGroupAlertBehavior(notificationOld.getGroupAlertBehavior())
                             .setShortcutId(notificationOld.getShortcutId())
@@ -79,7 +79,7 @@ public class NLService extends NotificationListenerService {
                             .setSettingsText(notificationOld.getSettingsText())
                             .setTimeoutAfter(notificationOld.getTimeoutAfter())
                             .setAutoCancel(true)
-                            .setChannelId("InstagramXNotificationChannel");
+                            .setChannelId("instagram_messengerNotificationChannel");
                 }
 
         if(sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT) != null) {
@@ -101,16 +101,16 @@ public class NLService extends NotificationListenerService {
 
 
         //open app when clicked
-        Intent intent = getPackageManager().getLaunchIntentForPackage("com.example.instagramx");
+        Intent intent = getPackageManager().getLaunchIntentForPackage("com.example.instagram_messenger");
         PendingIntent pIntent = PendingIntent.getActivity(this, 0,intent, FLAG_IMMUTABLE);
         mBuilder.setContentIntent(pIntent);
 
         //group messages
         String groupID = null;
         if (sbn.getNotification().extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE) != null) {
-            groupID = "com.example.instagramx."+sbn.getNotification().extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE).toString();
+            groupID = "com.example.instagram_messenger."+sbn.getNotification().extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE).toString();
         } else if (sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE) != null) {
-            groupID = "com.example.instagramx."+sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE).toString();
+            groupID = "com.example.instagram_messenger."+sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE).toString();
         }
         mBuilder.setGroup(groupID);
 
@@ -145,7 +145,7 @@ public class NLService extends NotificationListenerService {
         super.onCreate();
         NotificationChannel channel = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            channel = new NotificationChannel("InstagramXNotificationChannel", "InstagramX", NotificationManager.IMPORTANCE_HIGH);
+            channel = new NotificationChannel("instagram_messengerNotificationChannel", "instagram_messenger", NotificationManager.IMPORTANCE_HIGH);
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
         }

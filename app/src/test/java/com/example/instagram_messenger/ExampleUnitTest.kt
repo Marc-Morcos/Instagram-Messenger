@@ -1,4 +1,4 @@
-package com.example.instagramx
+package com.example.instagram_messenger
 
 import org.junit.Test
 

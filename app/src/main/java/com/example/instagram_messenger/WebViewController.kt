@@ -1,4 +1,4 @@
-package com.example.instagramx
+package com.example.instagram_messenger
 import android.net.Uri
 import android.util.Log
 import android.webkit.WebView

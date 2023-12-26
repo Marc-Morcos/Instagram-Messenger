@@ -1,4 +1,4 @@
-package com.example.instagramx
+package com.example.instagram_messenger
 
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -18,7 +18,7 @@ import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import com.example.instagramx.databinding.FragmentFirstBinding
+import com.example.instagram_messenger.databinding.FragmentFirstBinding
 
 
 //context for user throughout app

@@ -1,11 +1,11 @@
-package com.example.instagramx
+package com.example.instagram_messenger
 
 import android.app.NotificationManager
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.example.instagramx.databinding.ActivityMainBinding
+import com.example.instagram_messenger.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
