@@ -37,4 +37,6 @@ If you encounter any issues or have suggestions for improvement, please open an 
 
 Instagram Messenger is licensed under the [MIT License](LICENSE), ensuring an open and collaborative development environment.
 
+The Instagram name and logo belong to Meta.
+
 Happy browsing with Instagram Messenger!
