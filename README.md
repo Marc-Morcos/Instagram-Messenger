@@ -27,7 +27,7 @@ Now you're all set to receive notifications seamlessly through Instagram Messeng
 
 To get started with Instagram Messenger
 1. Enable developer options https://developer.android.com/studio/debug/dev-options
-2. Download and install the APK
+2. Download and install the APK from https://github.com/MarcM0/Instagram-Messenger/releases/tag/releases
 
 ## Issues
 
