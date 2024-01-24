@@ -70,11 +70,6 @@ class WebViewController : WebViewClient() {
 
         //if external thing, open in other browser
         if (globalContext!= null && !instagramHostNames.contains(host)) {
-            var urlNew = url
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                urlNew = "http://$url"
-            }
-
             val tabIntentBuilder = CustomTabsIntent.Builder()
             val tabsIntent = tabIntentBuilder.build()
             tabsIntent.launchUrl(globalContext!!, Uri.parse(url))
