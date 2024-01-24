@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -18,6 +17,7 @@ import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.instagram_messenger.databinding.FragmentFirstBinding
 
 
@@ -35,6 +35,8 @@ class FirstFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private var SwipeRefreshLayout: SwipeRefreshLayout? = null
 
     //https://stackoverflow.com/questions/45603682/file-upload-in-webview-android-studio
     private var _binding: FragmentFirstBinding? = null
@@ -91,6 +93,13 @@ class FirstFragment : Fragment() {
         mWebSettings.builtInZoomControls = true
         mWebSettings.allowFileAccess = true
         mWebSettings.allowContentAccess = true
+
+        //pull up to refresh
+        SwipeRefreshLayout = root.findViewById<WebView>(R.id.swiperefresh) as SwipeRefreshLayout
+        SwipeRefreshLayout!!.setOnRefreshListener {
+            mWebView!!.reload();
+            SwipeRefreshLayout!!.isRefreshing = false;
+        }
 
 //      Load image on long press
         webView.setOnLongClickListener(View.OnLongClickListener { v ->
