@@ -99,12 +99,6 @@ public class NLService extends NotificationListenerService {
             }
         }
 
-
-        //open app when clicked
-        Intent intent = getPackageManager().getLaunchIntentForPackage("com.example.instagram_messenger");
-        PendingIntent pIntent = PendingIntent.getActivity(this, 0,intent, FLAG_IMMUTABLE);
-        mBuilder.setContentIntent(pIntent);
-
         //group messages
         String groupID = null;
         if (sbn.getNotification().extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE) != null) {
@@ -113,6 +107,13 @@ public class NLService extends NotificationListenerService {
             groupID = "com.example.instagram_messenger."+sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE).toString();
         }
         mBuilder.setGroup(groupID);
+
+
+        //open app when clicked
+        Intent intent = getPackageManager().getLaunchIntentForPackage("com.example.instagram_messenger");
+        intent.putExtra("convoName",groupID);
+        PendingIntent pIntent = PendingIntent.getActivity(this, 0,intent, FLAG_IMMUTABLE);
+        mBuilder.setContentIntent(pIntent);
 
         //post new notification
         postNotification(mBuilder.build());
@@ -166,6 +167,29 @@ public class NLService extends NotificationListenerService {
         }
     }
 
+
+    @Override
+    public void onNotificationRemoved(StatusBarNotification sbn) {
+//        Log.i(TAG, "********** onNotificationRemoved");
+
+        //remove all notifications in group when one removed
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        StatusBarNotification notiList[] = notificationManager.getActiveNotifications();
+        String group = sbn.getNotification().getGroup();
+        if(group == null || !sbn.getPackageName().toString().equals("com.example.instagram_messenger")){
+            return;
+        }
+
+        for(int i=0;i<notiList.length;i++){
+            if(notiList[i].getPackageName().toString().equals("com.example.instagram_messenger")
+               && notiList[i].getNotification().getGroup().equals(group)){
+                int notiId = notiList[i].getId();
+                notificationManager.cancel(notiList[i].getTag(),notiId);
+            }
+
+        }
+
+    }
 
     //need to manually enable a protected setting for this to work
     @Override
