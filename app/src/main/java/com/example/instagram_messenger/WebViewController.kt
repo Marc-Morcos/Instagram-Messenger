@@ -1,9 +1,15 @@
 package com.example.instagram_messenger
+
 import android.net.Uri
 import android.util.Log
+import android.view.GestureDetector
+import android.view.GestureDetector.SimpleOnGestureListener
+import android.view.MotionEvent
+import android.view.View.OnTouchListener
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.browser.customtabs.CustomTabsIntent
+
 
 //import android.content.Context
 //import android.net.ConnectivityManager
@@ -18,6 +24,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 // class is extended to WebViewClient to access the WebView
 class WebViewController : WebViewClient() {
     private var history = ArrayDeque<String>()
+    private var lastClickDoubleClick = false
 
     val startPageUrl = "https://www.instagram.com/direct/inbox/"
 
@@ -76,7 +83,12 @@ class WebViewController : WebViewClient() {
             return true
         }
 
-        //if instagram link, do normal redirects
+        //if instagram link and double click, reject
+        if(lastClickDoubleClick){
+            return true
+        }
+
+        //if instagram link and not double click, do normal redirects
         return doRedirect(view,url)
     }
 
@@ -106,4 +118,28 @@ class WebViewController : WebViewClient() {
             super.doUpdateVisitedHistory(view, url, isReload)
         }
     }
+
+    //fix double click opening links and liking (only like)
+    //https://stackoverflow.com/questions/10418757/make-a-double-click-work-in-a-webview
+    private var gs: GestureDetector? = null
+
+    val onTouch = OnTouchListener { v, event ->
+        if (gs == null) {
+            gs = GestureDetector(
+                object : SimpleOnGestureListener() {
+                    override fun onDoubleTapEvent(e: MotionEvent): Boolean {
+                        lastClickDoubleClick = true
+                        return super.onSingleTapConfirmed(e)
+                    }
+
+                    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                        lastClickDoubleClick = false
+                        return super.onSingleTapConfirmed(e)
+                    }
+                })
+        }
+        gs!!.onTouchEvent(event)
+        false
+    }
 }
+

@@ -3,6 +3,7 @@ package com.example.instagram_messenger
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.getIntent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -18,6 +19,10 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import com.example.instagram_messenger.databinding.FragmentFirstBinding
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 
 
 //context for user throughout app
@@ -27,7 +32,7 @@ var globalContext: Context? = null
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment() {
+class FirstFragment : Fragment()  {
 
 
 
@@ -43,6 +48,10 @@ class FirstFragment : Fragment() {
     var uploadMessage: ValueCallback<Array<Uri>>? = null
     val REQUEST_SELECT_FILE = 100
     private val FILECHOOSER_RESULTCODE = 1
+
+    //keep track of when app last stopped
+    private var lastPausedTime = TimeSource.Monotonic.markNow()
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (requestCode == REQUEST_SELECT_FILE) {
@@ -101,6 +110,10 @@ class FirstFragment : Fragment() {
             false
         })
 
+        //fix double click opening links and liking (only like)
+        webView.setOnTouchListener(web_view_controller.onTouch);
+
+
         //https://stackoverflow.com/questions/45603682/file-upload-in-webview-android-studio
         mWebView!!.webChromeClient = object : WebChromeClient() {
 
@@ -156,6 +169,24 @@ class FirstFragment : Fragment() {
         )
 
         return root
+
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        lastPausedTime = TimeSource.Monotonic.markNow()
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+
+        //reload home page when app has been closed for a while
+        val reloadAfter: Duration = 5.minutes
+        if(TimeSource.Monotonic.markNow()-lastPausedTime > reloadAfter){
+            mWebView!!.loadUrl(web_view_controller.startPageUrl)
+        }
 
     }
 

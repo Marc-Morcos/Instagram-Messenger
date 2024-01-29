@@ -100,20 +100,23 @@ public class NLService extends NotificationListenerService {
         }
 
         //group messages
-        String groupID = null;
+        String groupIDSuffix = "";
+        String groupIDPrefix = "com.example.instagram_messenger.";
         if (sbn.getNotification().extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE) != null) {
-            groupID = "com.example.instagram_messenger."+sbn.getNotification().extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE).toString();
+            groupIDSuffix = sbn.getNotification().extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE).toString();
         } else if (sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE) != null) {
-            groupID = "com.example.instagram_messenger."+sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE).toString();
+            groupIDSuffix = sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE).toString();
         }
-        mBuilder.setGroup(groupID);
 
-
-        //open app when clicked
+        //open app when clicked, with convoname
         Intent intent = getPackageManager().getLaunchIntentForPackage("com.example.instagram_messenger");
-        intent.putExtra("convoName",groupID);
+        intent.putExtra("convoName",groupIDSuffix);
         PendingIntent pIntent = PendingIntent.getActivity(this, 0,intent, FLAG_IMMUTABLE);
         mBuilder.setContentIntent(pIntent);
+
+        //set group id
+        String groupID = groupIDPrefix+groupIDSuffix;
+        mBuilder.setGroup(groupID);
 
         //post new notification
         postNotification(mBuilder.build());
