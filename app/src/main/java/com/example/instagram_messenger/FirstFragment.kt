@@ -142,18 +142,7 @@ class FirstFragment : Fragment()  {
                 }
                 return true
             }
-
-
-            protected fun openFileChooser(uploadMsg: ValueCallback<Uri>) {
-                mUploadMessage = uploadMsg
-                val i = Intent(Intent.ACTION_GET_CONTENT)
-                i.addCategory(Intent.CATEGORY_OPENABLE)
-                i.type = "image/*"
-                startActivityForResult(
-                    Intent.createChooser(i, "File Chooser"),
-                    FILECHOOSER_RESULTCODE
-                )
-            }
+            
         }
 
         //load start page
