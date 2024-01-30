@@ -84,7 +84,9 @@ class WebViewController : WebViewClient() {
         }
 
         //if instagram link and double click, reject
+        Thread.sleep(250) //wait for double click
         if(lastClickDoubleClick){
+            lastClickDoubleClick = false //fix bug where next click ignored
             return true
         }
 
