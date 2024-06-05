@@ -28,6 +28,8 @@ class WebViewController : WebViewClient() {
 
     val startPageUrl = "https://www.instagram.com/direct/inbox/"
 
+    val IndividualPostPrefix = "https://www.instagram.com/p/" //instagram posts start with this prefix
+
     private val linkMap = mapOf(
         "https://www.instagram.com/" to "https://www.instagram.com/notifications/",
         "https://www.instagram.com/explore/" to "https://www.instagram.com/explore/search/",
@@ -45,12 +47,16 @@ class WebViewController : WebViewClient() {
 
         //goBack command doesn't give me enough control, so keep my own history
         if (!history.isEmpty()) {
-            //to previous page if possible
-            view.loadUrl(history.removeLast());
+            val previousUrl = history.removeLast()
+            if( view.getUrl() != previousUrl) {
+                view.loadUrl(previousUrl)
+            }
         } else {
             //to start page if no history
             Log.d("navAlert", "Empty history, going home")
-            view.loadUrl(startPageUrl)
+            if( view.getUrl() != startPageUrl) {
+                view.loadUrl(startPageUrl)
+            }
         }
     }
 
@@ -59,7 +65,9 @@ class WebViewController : WebViewClient() {
     {
         if (view != null && linkMap.containsKey(url)) {
             val urlNew = linkMap[url]!!
-            view.loadUrl(urlNew)
+            if( view.getUrl() != urlNew) {
+                view.loadUrl(urlNew)
+            }
 
             return true
         }
@@ -83,11 +91,13 @@ class WebViewController : WebViewClient() {
             return true
         }
 
-        //if instagram link and double click, reject
-        Thread.sleep(250) //wait for double click
-        if(lastClickDoubleClick){
-            lastClickDoubleClick = false //fix bug where next click ignored
-            return true
+        //if instagram post and double click, reject
+        if(url.startsWith(IndividualPostPrefix)) {
+            Thread.sleep(400) //wait for double click
+            if (lastClickDoubleClick) {
+                lastClickDoubleClick = false //fix bug where next click ignored
+                return true
+            }
         }
 
         //if instagram link and not double click, do normal redirects
@@ -125,7 +135,7 @@ class WebViewController : WebViewClient() {
     //https://stackoverflow.com/questions/10418757/make-a-double-click-work-in-a-webview
     private var gs: GestureDetector? = null
 
-    val onTouch = OnTouchListener { v, event ->
+    val onTouch = OnTouchListener { _, event ->
         if (gs == null) {
             gs = GestureDetector(
                 object : SimpleOnGestureListener() {
