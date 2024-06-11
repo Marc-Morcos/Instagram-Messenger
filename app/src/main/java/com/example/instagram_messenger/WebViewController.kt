@@ -24,7 +24,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 // class is extended to WebViewClient to access the WebView
 class WebViewController : WebViewClient() {
     private var history = ArrayDeque<String>()
-    private var lastClickDoubleClick = false
+    @Volatile private var lastClickType = 0
 
     val startPageUrl = "https://www.instagram.com/direct/inbox/"
 
@@ -93,9 +93,11 @@ class WebViewController : WebViewClient() {
 
         //if instagram post and double click, reject
         if(url.startsWith(IndividualPostPrefix)) {
-            Thread.sleep(400) //wait for double click
-            if (lastClickDoubleClick) {
-                lastClickDoubleClick = false //fix bug where next click ignored
+            while(lastClickType==0){
+                Thread.sleep(100) //wait for click type
+            }
+//            Log.i("Instagram Messenger Double Click","Read double click "+lastClickType.toString())
+            if (lastClickType == 2) { 
                 return true
             }
         }
@@ -139,14 +141,26 @@ class WebViewController : WebViewClient() {
         if (gs == null) {
             gs = GestureDetector(
                 object : SimpleOnGestureListener() {
-                    override fun onDoubleTapEvent(e: MotionEvent): Boolean {
-                        lastClickDoubleClick = true
-                        return super.onSingleTapConfirmed(e)
+
+                    //detect double click
+                    override fun onDoubleTap(e: MotionEvent): Boolean {
+                        lastClickType = 2
+                        Log.i("Instagram Messenger Double Click","Write double click 2"+lastClickType.toString())
+                        return super.onDoubleTap(e)
                     }
 
-                    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                        lastClickDoubleClick = false
-                        return super.onSingleTapConfirmed(e)
+                    //detect single click
+                    override fun onSingleTapUp(e: MotionEvent): Boolean {
+                        lastClickType = 0
+                        Thread { //wait to confirm its a single click
+                            Thread.sleep(400)
+                            if(lastClickType==0){
+                                lastClickType = 1
+//                                Log.i("Instagram Messenger Double Click","Write double click 1"+lastClickType.toString())
+                            }
+                        }.start()
+//                        Log.i("Instagram Messenger Double Click","Write double click 0"+lastClickType.toString())
+                        return super.onSingleTapUp(e)
                     }
                 })
         }
