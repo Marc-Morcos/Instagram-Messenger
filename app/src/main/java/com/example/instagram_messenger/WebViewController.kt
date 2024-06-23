@@ -1,6 +1,8 @@
 package com.example.instagram_messenger
 
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
@@ -53,7 +55,7 @@ class WebViewController : WebViewClient() {
             }
         } else {
             //to start page if no history
-            Log.d("navAlert", "Empty history, going home")
+//            Log.d("navAlert", "Empty history, going home")
             if( view.getUrl() != startPageUrl) {
                 view.loadUrl(startPageUrl)
             }
@@ -81,7 +83,7 @@ class WebViewController : WebViewClient() {
 
         val host = (Uri.parse(url).getHost())
         if(host!=null){
-            Log.d("navAlert, host:", host)} //print host
+//            Log.d("navAlert, host:", host)} //print host
 
         //if external thing, open in other browser
         if (globalContext!= null && !instagramHostNames.contains(host)) {
@@ -93,8 +95,18 @@ class WebViewController : WebViewClient() {
 
         //if instagram post and double click, reject
         if(url.startsWith(IndividualPostPrefix)) {
-            while(lastClickType==0){
-                Thread.sleep(100) //wait for click type
+            if(lastClickType==0){
+                Thread { //wait to confirm its a single click
+                    while(lastClickType==0){
+                        Thread.sleep(100);
+                    }
+                    if(lastClickType==1) {
+                        Handler(Looper.getMainLooper()).post {
+                            view?.loadUrl(url);
+                        }
+                    }
+                }.start()
+                return true;
             }
 //            Log.i("Instagram Messenger Double Click","Read double click "+lastClickType.toString())
             if (lastClickType == 2) { 
@@ -114,7 +126,7 @@ class WebViewController : WebViewClient() {
             return
         }
 
-        if (url != null) Log.d("navAlert", url) //print site we are currently navigating to
+//        if (url != null) Log.d("navAlert", url) //print site we are currently navigating to
 
         if (doRedirect(view,url)) {
             //doUpdateVisitedHistory will be called again due to loadUrl
@@ -124,7 +136,7 @@ class WebViewController : WebViewClient() {
                 //filter duplicates
                 val last = history.lastOrNull()
                 if(last == null || last != url) {
-                    Log.d("navAlert", "Add " + url + " to history")
+//                    Log.d("navAlert", "Add " + url + " to history")
                     history.add(url)
                 }
             }
@@ -145,22 +157,23 @@ class WebViewController : WebViewClient() {
                     //detect double click
                     override fun onDoubleTap(e: MotionEvent): Boolean {
                         lastClickType = 2
-                        Log.i("Instagram Messenger Double Click","Write double click 2"+lastClickType.toString())
+//                        Log.i("Instagram Messenger Double Click","Write double click 2"+lastClickType.toString())
                         return super.onDoubleTap(e)
                     }
 
-                    //detect single click
+                    //wait for single click
                     override fun onSingleTapUp(e: MotionEvent): Boolean {
                         lastClickType = 0
-                        Thread { //wait to confirm its a single click
-                            Thread.sleep(400)
-                            if(lastClickType==0){
-                                lastClickType = 1
-//                                Log.i("Instagram Messenger Double Click","Write double click 1"+lastClickType.toString())
-                            }
-                        }.start()
 //                        Log.i("Instagram Messenger Double Click","Write double click 0"+lastClickType.toString())
+
                         return super.onSingleTapUp(e)
+                    }
+
+                    //detect single click
+                    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                        lastClickType = 1
+//                        Log.i("Instagram Messenger Double Click","Write double click 1"+lastClickType.toString())
+                        return super.onSingleTapConfirmed(e)
                     }
                 })
         }
