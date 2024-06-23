@@ -82,8 +82,9 @@ class WebViewController : WebViewClient() {
         if(url==null){return true}
 
         val host = (Uri.parse(url).getHost())
-        if(host!=null){
-//            Log.d("navAlert, host:", host)} //print host
+//        if(host!=null){
+//            Log.d("navAlert, host:", host)
+//        } //print host
 
         //if external thing, open in other browser
         if (globalContext!= null && !instagramHostNames.contains(host)) {
