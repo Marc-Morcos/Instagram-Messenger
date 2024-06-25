@@ -96,7 +96,7 @@ class FirstFragment : Fragment()  {
         val mWebSettings = mWebView!!.settings
         mWebSettings.javaScriptEnabled = true
         mWebSettings.setSupportZoom(true)
-        mWebSettings.builtInZoomControls = true
+        mWebSettings.setBuiltInZoomControls(false)
         mWebSettings.allowFileAccess = true
         mWebSettings.allowContentAccess = true
 
