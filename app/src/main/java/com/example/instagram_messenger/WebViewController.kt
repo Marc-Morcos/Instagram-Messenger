@@ -96,21 +96,8 @@ class WebViewController : WebViewClient() {
 
         //if instagram post and double click, reject
         if(url.startsWith(IndividualPostPrefix)) {
-            if(lastClickType==0){
-                Thread { //wait to confirm its a single click
-                    while(lastClickType==0){
-                        Thread.sleep(100);
-                    }
-                    if(lastClickType==1) {
-                        Handler(Looper.getMainLooper()).post {
-                            view?.loadUrl(url);
-                        }
-                    }
-                }.start()
-                return true;
-            }
 //            Log.i("Instagram Messenger Double Click","Read double click "+lastClickType.toString())
-            if (lastClickType == 2) { 
+            if (lastClickType == 2) {
                 return true
             }
         }
@@ -141,6 +128,25 @@ class WebViewController : WebViewClient() {
                     history.add(url)
                 }
             }
+
+            //if instagram post and double click, reject
+            if(url!=null && url.startsWith(IndividualPostPrefix)) {
+                if(lastClickType==0){
+                    Thread { //wait to confirm its a single click
+                        while(lastClickType==0){
+                            Thread.sleep(100);
+                        }
+                        if(lastClickType==2) {
+                            returnToPrevious(view); //go back to previous page, was double click
+                            }
+
+                    }.start()
+                }else if (lastClickType == 2) {
+                    returnToPrevious(view); //go back to previous page, was double click
+                }
+            }
+
+
 
             super.doUpdateVisitedHistory(view, url, isReload)
         }
