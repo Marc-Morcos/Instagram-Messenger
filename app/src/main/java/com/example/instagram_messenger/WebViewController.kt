@@ -1,9 +1,8 @@
 package com.example.instagram_messenger
 
+import android.app.NotificationManager
+import android.content.Context
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
@@ -11,6 +10,7 @@ import android.view.View.OnTouchListener
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.ContextCompat.getSystemService
 
 
 //import android.content.Context
@@ -31,6 +31,8 @@ class WebViewController : WebViewClient() {
     val startPageUrl = "https://www.instagram.com/direct/inbox/"
 
     val IndividualPostPrefix = "https://www.instagram.com/p/" //instagram posts start with this prefix
+
+    val DMPrefix = "https://www.instagram.com/direct/t/" //DMs start with this prefix
 
     private val linkMap = mapOf(
         "https://www.instagram.com/" to "https://www.instagram.com/notifications/",
@@ -87,10 +89,10 @@ class WebViewController : WebViewClient() {
 //        } //print host
 
         //if external thing, open in other browser
-        if (globalContext!= null && !instagramHostNames.contains(host)) {
+        if (com.example.instagram_messenger.globalContext!= null && !instagramHostNames.contains(host)) {
             val tabIntentBuilder = CustomTabsIntent.Builder()
             val tabsIntent = tabIntentBuilder.build()
-            tabsIntent.launchUrl(globalContext!!, Uri.parse(url))
+            tabsIntent.launchUrl(com.example.instagram_messenger.globalContext!!, Uri.parse(url))
             return true
         }
 
@@ -144,6 +146,12 @@ class WebViewController : WebViewClient() {
                 }else if (lastClickType == 2) {
                     returnToPrevious(view); //go back to previous page, was double click
                 }
+            }
+
+            //cancel all notifications when you open a chat
+            if(url!=null && url.startsWith(DMPrefix) && com.example.instagram_messenger.globalContext!=null){
+                val notificationManager = com.example.instagram_messenger.globalContext!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager!!.cancelAll();
             }
 
 
