@@ -31,7 +31,7 @@ To get started with Instagram Messenger
 
 ## Issues
 
-If you encounter any issues or have suggestions for improvement, please open an issue on the [GitHub repository](link-to-repository). Your feedback is valuable in making Instagram Messenger even better.
+If you encounter any issues or have suggestions for improvement, please open an issue on the [GitHub repository](https://github.com/Marc-Morcos/Instagram-Messenger). Your feedback is valuable in making Instagram Messenger even better.
 
 ## License
 
